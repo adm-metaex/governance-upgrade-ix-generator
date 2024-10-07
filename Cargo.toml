@@ -1,0 +1,9 @@
+[package]
+name = "governance_upgrade_ix_base64_generator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+base64 = "0.22"
+borsh = "1.5"
+solana-program = "1.18.9"
