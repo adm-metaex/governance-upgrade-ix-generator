@@ -3,7 +3,7 @@ use std::str::FromStr;
 use base64::{engine::general_purpose, Engine};
 use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
 use solana_program::{
-    bpf_loader_upgradeable,
+    bpf_loader_upgradeable::set_upgrade_authority,
     instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
 };
@@ -70,20 +70,27 @@ impl From<&InstructionData> for Instruction {
 
 fn main() {
     // Arrange
-    let program_address = Pubkey::from_str("6HsGPCjA4GxQCGSL1eTBSkXoah9hVooMBAkPEsmuPepn").unwrap();
-    let buffer_address = Pubkey::from_str("EdmCBT8oqL52NCXwxht67tusV7WT4R5ks8159FQqpiHc").unwrap();
+    // let program_address = Pubkey::from_str("78sycjkMouQ2HJnpnvDUzgBCt81jMJVZMf5rLhZ5bgrh").unwrap();
+    // let buffer_address = Pubkey::from_str("CjoWQim52bBVk9xZQJBoxwoiEcAHx68WTP8GrFKJdUKQ").unwrap();
     // in the current context, governance is the same as the upgrade authority of governance program
-    let governance = Pubkey::from_str("2x9j2onZBPfKCxkYpL8zyfNiH3987RWHG3rzW12yceDJ").unwrap();
+    // let governance = Pubkey::from_str("8Nm2CFjLx1Vnd1D1NvnCfdq3BJBzZ8aNRcCuTnhr7FVh").unwrap();
 
-    let upgrade_instruction = bpf_loader_upgradeable::upgrade(
-        &program_address,
-        &buffer_address,
-        &governance,
-        &governance,
-    );
+    let program_address = Pubkey::from_str("D9KEi2SGUuX71zgGYPBScScZagrm7J8jSEduBTF84xtj").unwrap();
+    let authority = Pubkey::from_str("C6DmyYh1KXNMAvdMzP845aP2WhXkfmvu6qaC9kQReKLQ").unwrap();
+    let new_authority = Pubkey::from_str("Bc1WrTZZUQyRQkKQNqcBqLpoxMQehx4mBXk3aVsJRxhp").unwrap();
+
+    let transfer_instruction =
+        set_upgrade_authority(&program_address, &authority, Some(&new_authority));
+
+    // let upgrade_instruction = bpf_loader_upgradeable::upgrade(
+    //     &program_address,
+    //     &buffer_address,
+    //     &governance,
+    //     &governance,
+    // );
 
     // Act
-    let instruction_data: InstructionData = upgrade_instruction.clone().into();
+    let instruction_data: InstructionData = transfer_instruction.clone().into();
     let mut instruction_bytes = vec![];
     instruction_data.serialize(&mut instruction_bytes).unwrap();
 
@@ -94,7 +101,7 @@ fn main() {
     let instruction =
         Instruction::from(&InstructionData::deserialize(&mut &instruction_bytes[..]).unwrap());
 
-    assert_eq!(upgrade_instruction, instruction);
+    assert_eq!(transfer_instruction, instruction);
 
     println!("Encoded ix: {}", encoded);
 }

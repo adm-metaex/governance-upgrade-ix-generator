@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 base64 = "0.22"
 borsh = "1.5"
-solana-program = "1.18.9"
+solana-program = "2"
